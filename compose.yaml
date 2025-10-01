@@ -10,6 +10,7 @@ services:
     ports:
       - "8069:8069"
     environment:
+      # https://hub.docker.com/_/odoo/#environment-variables
       - HOST=db
       - USER=odoo
       - PASSWORD_FILE=/run/secrets/postgresql_password
@@ -23,6 +24,7 @@ services:
   db:
     image: postgres:15
     environment:
+      # https://hub.docker.com/_/postgres
       # https://github.com/docker-library/docs/blob/master/postgres/README.md
       - POSTGRES_DB=postgres
       - POSTGRES_USER=odoo
@@ -40,6 +42,7 @@ services:
     restart: always
     environment:
     # https://access.crunchydata.com/documentation/pgadmin4/latest/container_deployment.html
+    # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
       PGADMIN_DEFAULT_EMAIL: infmcrego@elorrieta-errekamari.com
       PGADMIN_DEFAULT_PASSWORD: odoo
       # PGADMIN_DEFAULT_PASSWORD_FILE
@@ -57,4 +60,4 @@ volumes:
 
 secrets:
   postgresql_password:
-    file: postgresql_password
+    file: ./secrets/postgresql_password
