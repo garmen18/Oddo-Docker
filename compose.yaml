@@ -11,47 +11,55 @@ services:
       - "8069:8069"
     environment:
       # https://hub.docker.com/_/odoo/#environment-variables
-      - HOST=db
-      - USER=odoo
-      - PASSWORD_FILE=/run/secrets/postgresql_password
+      # - HOST=db
+      # - USER=odoo
+      - HOST_FILE=/run/secrets/db_host
+      - USER_FILE=/run/secrets/db_user
+      - PASSWORD_FILE=/run/secrets/db_pass
+      - ADMIN_PASSWORD_FILE=/run/secrets/odoo_admin_pass
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./config:/etc/odoo
       - ./addons:/mnt/extra-addons
     secrets:
-      - postgresql_password
+      - db_host
+      - db_user
+      - db_pass
+      - odoo_admin_pass
 
   db:
     image: postgres:15
     environment:
       # https://hub.docker.com/_/postgres
       # https://github.com/docker-library/docs/blob/master/postgres/README.md
+      # - POSTGRES_USER=odoo
+      # - POSTGRES_PASSWORD=odoo
       - POSTGRES_DB=postgres
-      - POSTGRES_USER=odoo
-      #- POSTGRES_PASSWORD=odoo
-      - POSTGRES_PASSWORD_FILE=/run/secrets/postgresql_password
-      - PGDATA=/var/lib/postgresql/data/pgdata # necesario?
+      - POSTGRES_USER_FILE=/run/secrets/db_user
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db_pass
+      - PGDATA=/var/lib/postgresql/data/pgdata
     volumes:
       - odoo-db-data:/var/lib/postgresql/data/pgdata
     secrets:
-      - postgresql_password
+      - db_user
+      - db_pass
 
   pgadmin:
     image: dpage/pgadmin4
     container_name: pgadmin4
     restart: always
-    environment:
-    # https://access.crunchydata.com/documentation/pgadmin4/latest/container_deployment.html
-    # https://www.pgadmin.org/docs/pgadmin4/latest/container_deployment.html
-      PGADMIN_DEFAULT_EMAIL: infmcrego@elorrieta-errekamari.com
-      PGADMIN_DEFAULT_PASSWORD: odoo
-      # PGADMIN_DEFAULT_PASSWORD_FILE
     ports:
       - 5050:80
     depends_on:
       - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL_FILE=/run/secrets/pgadmin_email
+      - PGADMIN_DEFAULT_PASSWORD_FILE=/run/secrets/pgadmin_pass
     volumes:
       - pgadmin-data:/var/lib/pgadmin
+    secrets:
+      - pgadmin_email
+      - pgadmin_pass
 
 volumes:
   odoo-web-data:
@@ -59,5 +67,16 @@ volumes:
   pgadmin-data:
 
 secrets:
-  postgresql_password:
-    file: ./secrets/postgresql_password
+  db_host:
+    file: ./secrets/db_host.txt
+  db_pass:
+    file: ./secrets/db_pass.txt
+  db_user:
+    file: ./secrets/db_user.txt
+  odoo_admin_pass:
+    file: ./secrets/odoo_admin_pass.txt
+  pgadmin_email:
+    file: ./secrets/pgadmin_email.txt
+  pgadmin_pass:
+    file: ./secrets/pgadmin_pass.txt
+
