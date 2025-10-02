@@ -1,0 +1,63 @@
+# https://hub.docker.com/_/odoo/
+# https://www.youtube.com/watch?v=vCUBjMytEH8
+# https://github.com/CampiGroup/odoo-docker-setup
+
+services:
+  web:
+    image: odoo:18
+    depends_on:
+      - db
+    ports:
+      - "8069:8069"
+    environment:
+      # https://hub.docker.com/_/odoo/#environment-variables
+      - HOST=db
+      - USER=odoo
+      # - HOST_FILE=/run/secrets/db_host
+      # - USER_FILE=/run/secrets/db_user
+      # - PASSWORD_FILE=/run/secrets/db_pass
+      - PASSWORD=Admin12345
+      # - ADMIN_PASSWORD_FILE=/run/secrets/odoo_admin_pass
+    #volumes:
+    #  - odoo-web-data:/var/lib/odoo
+    #  - ./config:/etc/odoo
+    #  - ./addons:/mnt/extra-addons
+    #secrets:
+    #  - db_host
+    #  - db_user
+    #  - db_pass
+    #  - odoo_admin_pass
+  db:
+    image: postgres:15
+    environment:
+      - POSTGRES_USER=odoo
+      - POSTGRES_DB=postgres
+      - POSTGRES_PASSWORD_FILE=/run/secrets/passwd
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - odoo-db-data:/var/lib/postgresql/data/pgdata
+    secrets:
+      - passwd
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin4
+    restart: always
+    ports:
+      - 5050:80
+    depends_on:
+      - db
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=infmcrego@elorrieta-errekamari.com
+      - PGADMIN_DEFAULT_PASSWORD=odoo
+    volumes:
+      - pgadmin-data:/var/lib/pgadmin
+
+volumes:
+  odoo-web-data:
+  odoo-db-data:
+  pgadmin-data:
+
+secrets:
+  passwd:
+    file: passwd
