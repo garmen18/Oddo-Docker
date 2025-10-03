@@ -1,7 +1,3 @@
-# https://hub.docker.com/_/odoo/
-# https://www.youtube.com/watch?v=vCUBjMytEH8
-# https://github.com/CampiGroup/odoo-docker-setup
-# docker compose down --volumes
 services:
   web:
     image: odoo:18
@@ -10,12 +6,9 @@ services:
     ports:
       - "8069:8069"
     environment:
-    # https://github.com/bitnami/containers/blob/main/bitnami/odoo/README.md
-      # - HOST=db
       - USER=odooDB # debe coincidir con el archivo db_user
       - HOST_FILE=/run/secrets/db_host
       - PASSWORD_FILE=/run/secrets/db_pass
-      # Si publicas tu instancia en internet, siempre configura la variable ADMIN_PASSWORD, o cualquiera podrá ver y modificar tus bases de datos desde /web/database/manager
       - ADMIN_PASSWORD_FILE=/run/secrets/odoo_admin_pass
     volumes:
       - odoo-web-data:/var/lib/odoo
@@ -23,14 +16,12 @@ services:
       - ./addons:/mnt/extra-addons
     secrets:
       - db_host
-      #- db_user
       - db_pass
       - odoo_admin_pass
 
   db:
     image: postgres:15
     environment:
-      # https://github.com/docker-library/docs/blob/master/postgres/README.md
       - POSTGRES_DB=postgres
       - POSTGRES_USER_FILE=/run/secrets/db_user
       - POSTGRES_PASSWORD_FILE=/run/secrets/db_pass
@@ -46,8 +37,7 @@ services:
     container_name: pgadmin4
     restart: always
     environment:
-    # https://access.crunchydata.com/documentation/pgadmin4/latest/container_deployment.html
-      - PGADMIN_DEFAULT_EMAIL=infmcrego@elorrieta-errekamari.com
+      - PGADMIN_DEFAULT_EMAIL=infmcrego@elorrieta-errekamari.com # CAMBIAR
       - PGADMIN_DEFAULT_PASSWORD_FILE=/run/secrets/pgadmin_pass
     ports:
       - 5050:80
