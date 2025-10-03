@@ -288,9 +288,17 @@ En la carpeta secret:
 ### Como poner todo en marcha.
 
 Una vez editadas las variables de entorno, y ubicados en la raíz del proyecto.
-Montamos y arrancamos el proyecto: ```docker-compose up```. Hay que esperar. Se verá el estado, tanto en la consola como en la aplicación de Docker Desktop.
+Montamos y arrancamos el proyecto: ```docker-compose up```. Hay que esperar. Se verá el estado, tanto en la consola como en la aplicación de Docker Desktop. La primera vez se descargarán las 3 imágenes (odoo:18, postgres:15 y dpage/pgadmin4).
+
+![alt text](./images/docker/docker-compose-up.png)
 
 > Si hemos configurado algo mal y hemos modificado algún valor, especialmente los secrets, eliminaríamos los contenedores y los volúmenes con ```docker-compose down --volumes```. Al cambiar volveríamos a arrancarlo.
+
+
+Hay que tener en cuenta que puede que los contenedores no estén en marcha al mismo tiempo, por lo que comprobamos el estado. Si alguno no está en marcha pasado unos segundos, deberíamos mirar el log a ver qué está pasando.
+Si todo va bien, en docker compose veremos algo como esto:
+
+![alt text](./images/docker/docker-desktop-containers.png)
 
 ### Accediendo a los servicios / contenedores
 Una vez verificado que están los contenedores en marcha:
@@ -300,10 +308,35 @@ Una vez verificado que están los contenedores en marcha:
 Deberemos acceder a http://localhost:5050 . Solicita un usuario y contraseña:
 * Usuario: valor de `PGADMIN_DEFAULT_EMAIL`
 * Contraseña: valor del archivo `pgadmin_pass`.
+![alt text](./images/pgadmin/pgadmin4-home.png)
+
+##### Realizar la conexión.
+Pulsamos sobre **Add New Server**. 
+![alt text](./images/pgadmin/pgadmin4-add-server.png)
+* En la pestaña General asignamos un nombre.
+* En la pestaña Conexión rellenar los datos.
+    * HostName: El valor del archivo `db_host`. El nombre del contenedor de la base de datos en el yaml.
+    * Username: El valor del archivo `db_user`.
+    * Password: El valor del archivo `db_pass`.
+![alt text](./images/pgadmin/pgadmin4-connection.png)
+
+Y le damos a Save. Nos aparecerá la BD, en mi caso:
+![alt text](./images/pgadmin/connected.png)
 
 #### Acceder a Odoo.
 Deberemos acceder a http://localhost:8069 para llegar a la configuración:
 * En la instalación crearemos la base de datos y el usuario para acceder a Odoo.
-* La contraseña maestra a utilizar será la del archivo `odoo_admin_pass`.
+![alt text](./images/odoo/odoo-install.png)
+
+* Master Password: la contraseña será la del archivo `odoo_admin_pass`. Es la que permitirá crear la BBDD, ya que los datos de conexión a la BBDD ya están en el contenedor (se pusieron en las variables de entorno).
+* Database Name: El nombre que le vamos a dar a la base de datos en el contenedor postgres. Como el `create schema nombreDB`.
+* Email y contraseña: Será lo que utilicemos para acceder a Odoo.
+
+Pulsamos sobre `Create Database`. Tardará un poco en crear la base de datos. Al estar creada nos llevará a la pantalla de login con el email y contraseña que acabamos de poner. 
+![alt text](./images/odoo/odoo-home.png)
+
+
+Si vamos a pgadmin4 veremos que la BBDD se ha creado:
+![alt text](./images/pgadmin/pgadmin4-db-created.png)
 
 
