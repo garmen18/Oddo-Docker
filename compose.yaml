@@ -16,7 +16,7 @@ services:
       - HOST_FILE=/run/secrets/db_host
       - PASSWORD_FILE=/run/secrets/db_pass
       # Si publicas tu instancia en internet, siempre configura la variable ADMIN_PASSWORD, o cualquiera podrá ver y modificar tus bases de datos desde /web/database/manager
-      - ADMIN_PASSWORD_FILE=/run/secrets/odoo_admin_pass # no parece que lo este cogiendo
+      - ADMIN_PASSWORD_FILE=/run/secrets/odoo_admin_pass
     volumes:
       - odoo-web-data:/var/lib/odoo
       - ./config:/etc/odoo
